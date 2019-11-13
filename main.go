@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/joho/godotenv/autoload"
 	"net/http"
 	"os"
 )
@@ -23,21 +24,15 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-
 	mux := http.NewServeMux()
-
-	fs := http.FileServer(http.Dir("assets"))
-
-	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	mux.HandleFunc("/account", accountHandler)
 	mux.HandleFunc("/login", loginHandler)
 	mux.HandleFunc("/sign-up", signUpHandler)
 	mux.HandleFunc("/", indexHandler)
+
+	port := os.Getenv("PORT")
+
 	fmt.Println("Server started on port", port)
 	http.ListenAndServe(":"+port, mux)
 }
