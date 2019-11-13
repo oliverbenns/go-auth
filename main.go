@@ -14,6 +14,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+func signUpHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 func accountHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
@@ -32,6 +36,7 @@ func main() {
 
 	mux.HandleFunc("/account", accountHandler)
 	mux.HandleFunc("/login", loginHandler)
+	mux.HandleFunc("/sign-up", signUpHandler)
 	mux.HandleFunc("/", indexHandler)
 	fmt.Println("Server started on port", port)
 	http.ListenAndServe(":"+port, mux)
