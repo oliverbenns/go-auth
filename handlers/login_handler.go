@@ -53,35 +53,43 @@ func createToken(email string) string {
 
 	return tokenString
 }
+func getHandler(w http.ResponseWriter, r *http.Request) {
+	if isAuthenticatedUser(r) {
+		http.Redirect(w, r, "/account", http.StatusFound)
+	} else {
+		tmpl.Execute(w, nil)
+	}
+}
+
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	// r.
+	// @TODO: lookup user in DB
+	// qwerty
+	hash := "$2a$10$l3Lm6n/GIm9.j8/DTe05seV8E/uUPsh3Ie4NK08ncVUxLKRCnFqcK"
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	validCredentials := err == nil
+
+	if validCredentials {
+		token := createToken(email)
+		setUserToken(w, token)
+		alert := Alert{"Success!", "success"}
+		tmpl.Execute(w, alert)
+		// @TODO: Redirect
+		// http.Redirect(w, r, "/account", http.StatusFound)
+	} else {
+		alert := Alert{"Invalid credentials. Please try again.", "danger"}
+		tmpl.Execute(w, alert)
+	}
+}
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		if isAuthenticatedUser(r) {
-			http.Redirect(w, r, "/account", http.StatusFound)
-		} else {
-			tmpl.Execute(w, nil)
-		}
-	} else if r.Method == "POST" {
-		email := r.FormValue("email")
-		password := r.FormValue("password")
-		// r.
-		// @TODO: lookup user in DB
-		// qwerty
-		hash := "$2a$10$l3Lm6n/GIm9.j8/DTe05seV8E/uUPsh3Ie4NK08ncVUxLKRCnFqcK"
-		err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-		validCredentials := err == nil
+		getHandler(w, r)
 
-		if validCredentials {
-			token := createToken(email)
-			setUserToken(w, token)
-			alert := Alert{"Success!", "success"}
-			tmpl.Execute(w, alert)
-			// @TODO: Redirect
-			// http.Redirect(w, r, "/account", http.StatusFound)
-		} else {
-			alert := Alert{"Invalid credentials. Please try again.", "danger"}
-			tmpl.Execute(w, alert)
-		}
+	} else if r.Method == "POST" {
+		postHandler(w, r)
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}
