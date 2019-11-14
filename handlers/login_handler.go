@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
+	"os"
 )
 
 var tmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/login.tmpl"))
@@ -39,6 +41,19 @@ func isAuthenticatedUser(r *http.Request) bool {
 	return validUser
 }
 
+func createToken(email string) string {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": email,
+	})
+
+	secretKey := os.Getenv("JWT_SECRET_KEY")
+	secret := []byte(secretKey)
+
+	tokenString, _ := token.SignedString(secret)
+
+	return tokenString
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		if isAuthenticatedUser(r) {
@@ -47,7 +62,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			tmpl.Execute(w, nil)
 		}
 	} else if r.Method == "POST" {
-		// email := r.FormValue("email")
+		email := r.FormValue("email")
 		password := r.FormValue("password")
 		// r.
 		// @TODO: lookup user in DB
@@ -57,9 +72,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		validCredentials := err == nil
 
 		if validCredentials {
-			// @TODO issue jwt
-			jwt := "abc"
-			setUserToken(w, jwt)
+			token := createToken(email)
+			setUserToken(w, token)
 			alert := Alert{"Success!", "success"}
 			tmpl.Execute(w, alert)
 			// @TODO: Redirect
