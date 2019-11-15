@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var indexTmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/index.tmpl"))
+var indexTmpl = template.Must(template.ParseFiles("views/layout.html", "views/index.html"))
 
 type User struct {
 	Email string

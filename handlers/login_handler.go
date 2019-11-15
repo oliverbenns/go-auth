@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-var loginTmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/login.tmpl"))
+var loginTmpl = template.Must(template.ParseFiles("views/layout.html", "views/login.html"))
 
 type Alert struct {
 	Message string

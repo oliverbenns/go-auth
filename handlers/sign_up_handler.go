@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var signUpTmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/sign_up.tmpl"))
+var signUpTmpl = template.Must(template.ParseFiles("views/layout.html", "views/sign_up.html"))
 
 func signUpGetHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("user_token")
