@@ -28,6 +28,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		indexGetHandler(w, r)
 	} else {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusNotImplemented)
 	}
 }

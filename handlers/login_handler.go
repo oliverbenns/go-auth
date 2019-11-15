@@ -67,6 +67,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "POST" {
 		loginPostHandler(w, r)
 	} else {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusNotImplemented)
 	}
 }

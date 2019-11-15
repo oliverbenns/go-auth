@@ -62,6 +62,6 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "POST" {
 		signUpPostHandler(w, r)
 	} else {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusNotImplemented)
 	}
 }
