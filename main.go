@@ -14,6 +14,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("/logout", handlers.LogoutHandler)
 	mux.HandleFunc("/login", handlers.LoginHandler)
 	mux.HandleFunc("/sign-up", handlers.SignUpHandler)
 	mux.HandleFunc("/", handlers.IndexHandler)
