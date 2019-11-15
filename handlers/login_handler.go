@@ -10,42 +10,27 @@ import (
 	"net/http"
 )
 
-var tmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/login.tmpl"))
+var loginTmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/login.tmpl"))
 
 type Alert struct {
 	Message string
 	Theme   string
 }
 
-var invalidAlert = Alert{"Invalid credentials. Please try again.", "danger"}
+var invalidCredentialsAlert = Alert{"Invalid credentials. Please try again.", "danger"}
 
-func setUserToken(w http.ResponseWriter, userToken string) {
-	cookie := http.Cookie{
-		Name:     "user_token",
-		Value:    userToken,
-		Domain:   "localhost",
-		Path:     "/",
-		MaxAge:   0,
-		HttpOnly: true,
-	}
-
-	http.SetCookie(w, &cookie)
-}
-
-func getHandler(w http.ResponseWriter, r *http.Request) {
+func loginGetHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("user_token")
 	validUser := err == nil && auth.ValidateToken(cookie.Value)
-
-	fmt.Println("validUser", validUser)
 
 	if validUser {
 		http.Redirect(w, r, "/account", http.StatusFound)
 	} else {
-		tmpl.Execute(w, nil)
+		loginTmpl.Execute(w, nil)
 	}
 }
 
-func postHandler(w http.ResponseWriter, r *http.Request) {
+func loginPostHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 	var hash string
@@ -56,7 +41,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			tmpl.Execute(w, invalidAlert)
+			loginTmpl.Execute(w, invalidCredentialsAlert)
 			return
 		} else {
 			panic(err)
@@ -68,19 +53,19 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	if validCredentials {
 		user := auth.User{email}
 		token := auth.CreateToken(user)
-		setUserToken(w, token)
+		auth.SetUserToken(w, token)
 		http.Redirect(w, r, "/account", http.StatusFound)
 	} else {
-		tmpl.Execute(w, invalidAlert)
+		loginTmpl.Execute(w, invalidCredentialsAlert)
 	}
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		getHandler(w, r)
+		loginGetHandler(w, r)
 
 	} else if r.Method == "POST" {
-		postHandler(w, r)
+		loginPostHandler(w, r)
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/oliverbenns/go-auth/db"
+	"net/http"
 	"os"
 )
 
@@ -61,4 +62,17 @@ func ValidateToken(tokenString string) bool {
 	}
 
 	return true
+}
+
+func SetUserToken(w http.ResponseWriter, userToken string) {
+	cookie := http.Cookie{
+		Name:   "user_token",
+		Value:  userToken,
+		Domain: "localhost",
+		Path:   "/",
+		// MaxAge:   0,
+		HttpOnly: true,
+	}
+
+	http.SetCookie(w, &cookie)
 }
