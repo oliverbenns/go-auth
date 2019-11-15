@@ -37,20 +37,6 @@ func setUserToken(w http.ResponseWriter, userToken string) {
 	http.SetCookie(w, &cookie)
 }
 
-func isAuthenticatedUser(r *http.Request) bool {
-	cookie, err := r.Cookie("user_token")
-
-	if err != nil {
-		return false
-	}
-
-	validUser := validateToken(cookie.Value)
-
-	fmt.Println("validUser", validUser)
-
-	return validUser
-}
-
 func createToken(user User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": user.Email,
@@ -83,15 +69,32 @@ func validateToken(tokenString string) bool {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 
-	if ok && token.Valid {
-		return claims["email"] == "abc@abc.com"
-	} else {
+	if !ok || !token.Valid {
 		return false
 	}
+
+	query := fmt.Sprintf("SELECT FROM users WHERE email='%s' LIMIT 1", claims["email"])
+	row := db.Db.QueryRow(query)
+	err = row.Scan()
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false
+		} else {
+			panic(err)
+		}
+	}
+
+	return true
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
-	if isAuthenticatedUser(r) {
+	cookie, err := r.Cookie("user_token")
+	validUser := err == nil && validateToken(cookie.Value)
+
+	fmt.Println("validUser", validUser)
+
+	if validUser {
 		http.Redirect(w, r, "/account", http.StatusFound)
 	} else {
 		tmpl.Execute(w, nil)
