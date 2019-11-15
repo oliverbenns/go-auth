@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
@@ -13,6 +14,10 @@ var tmpl = template.Must(template.ParseFiles("views/layout.tmpl", "views/login.t
 type Alert struct {
 	Message string
 	Theme   string
+}
+
+type User struct {
+	Email string
 }
 
 func setUserToken(w http.ResponseWriter, userToken string) {
@@ -35,15 +40,16 @@ func isAuthenticatedUser(r *http.Request) bool {
 		return false
 	}
 
-	// @TODO: validate jwt.
-	validUser := cookie.Value == "abc"
+	validUser := validateToken(cookie.Value)
+
+	fmt.Println("validUser", validUser)
 
 	return validUser
 }
 
-func createToken(email string) string {
+func createToken(user User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": email,
+		"email": user.Email,
 	})
 
 	secretKey := os.Getenv("JWT_SECRET_KEY")
@@ -53,6 +59,33 @@ func createToken(email string) string {
 
 	return tokenString
 }
+
+func validateToken(tokenString string) bool {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		secretKey := os.Getenv("JWT_SECRET_KEY")
+		secret := []byte(secretKey)
+
+		return secret, nil
+	})
+
+	if err != nil {
+		return false
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok && token.Valid {
+		return claims["email"] == "abc@abc.com"
+	} else {
+		return false
+	}
+}
+
 func getHandler(w http.ResponseWriter, r *http.Request) {
 	if isAuthenticatedUser(r) {
 		http.Redirect(w, r, "/account", http.StatusFound)
@@ -72,7 +105,8 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 	validCredentials := err == nil
 
 	if validCredentials {
-		token := createToken(email)
+		user := User{email}
+		token := createToken(user)
 		setUserToken(w, token)
 		alert := Alert{"Success!", "success"}
 		tmpl.Execute(w, alert)
