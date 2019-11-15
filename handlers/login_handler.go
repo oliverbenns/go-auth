@@ -24,7 +24,7 @@ func loginGetHandler(w http.ResponseWriter, r *http.Request) {
 	validUser := err == nil && auth.ValidateToken(cookie.Value)
 
 	if validUser {
-		http.Redirect(w, r, "/account", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		loginTmpl.Execute(w, nil)
 	}
@@ -54,7 +54,7 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request) {
 		user := auth.User{email}
 		token := auth.CreateToken(user)
 		auth.SetUserToken(w, token)
-		http.Redirect(w, r, "/account", http.StatusFound)
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		loginTmpl.Execute(w, invalidCredentialsAlert)
 	}
