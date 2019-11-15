@@ -22,5 +22,9 @@ func main() {
 	port := os.Getenv("PORT")
 
 	fmt.Println("Server started on port", port)
-	http.ListenAndServe(":"+port, mux)
+	err := http.ListenAndServe(":"+port, mux)
+
+	if err != nil {
+		panic(err)
+	}
 }
