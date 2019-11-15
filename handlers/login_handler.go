@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/oliverbenns/go-auth/db"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
@@ -15,6 +17,8 @@ type Alert struct {
 	Message string
 	Theme   string
 }
+
+var invalidAlert = Alert{"Invalid credentials. Please try again.", "danger"}
 
 type User struct {
 	Email string
@@ -97,24 +101,30 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 func postHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
-	// r.
-	// @TODO: lookup user in DB
-	// qwerty
-	hash := "$2a$10$l3Lm6n/GIm9.j8/DTe05seV8E/uUPsh3Ie4NK08ncVUxLKRCnFqcK"
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	validCredentials := err == nil
+	var hash string
+
+	query := fmt.Sprintf("SELECT hash FROM users WHERE email='%s' LIMIT 1", email)
+	row := db.Db.QueryRow(query)
+	err := row.Scan(&hash)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			tmpl.Execute(w, invalidAlert)
+			return
+		} else {
+			panic(err)
+		}
+	}
+
+	validCredentials := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 
 	if validCredentials {
 		user := User{email}
 		token := createToken(user)
 		setUserToken(w, token)
-		alert := Alert{"Success!", "success"}
-		tmpl.Execute(w, alert)
-		// @TODO: Redirect
-		// http.Redirect(w, r, "/account", http.StatusFound)
+		http.Redirect(w, r, "/account", http.StatusFound)
 	} else {
-		alert := Alert{"Invalid credentials. Please try again.", "danger"}
-		tmpl.Execute(w, alert)
+		tmpl.Execute(w, invalidAlert)
 	}
 }
 

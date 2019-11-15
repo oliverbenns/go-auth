@@ -12,22 +12,6 @@ import (
 func main() {
 	db.InitDb()
 
-	rows, _ := db.Db.Query("SELECT * FROM users")
-	defer rows.Close()
-
-	for rows.Next() {
-		var (
-			id         int64
-			email      string
-			hash       string
-			created_at string
-		)
-		if err := rows.Scan(&id, &email, &hash, &created_at); err != nil {
-			panic(err)
-		}
-		fmt.Printf("id %d email is %s\n", id, email)
-	}
-
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/account", handlers.AccountHandler)
