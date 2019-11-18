@@ -28,12 +28,13 @@ func loginGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 }
 
 func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	email := r.FormValue("email")
+	user := User{}
+	user.Email = r.FormValue("email")
 	password := r.FormValue("password")
 	var hash string
 
-	row := s.db.QueryRow("SELECT hash FROM users WHERE email=$1 LIMIT 1", email)
-	err := row.Scan(&hash)
+	row := s.db.QueryRow("SELECT id, hash FROM users WHERE email=$1 LIMIT 1", user.Email)
+	err := row.Scan(&user.Id, &hash)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -47,7 +48,6 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	validCredentials := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 
 	if validCredentials {
-		user := User{email}
 		token := s.CreateToken(user)
 		s.SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)

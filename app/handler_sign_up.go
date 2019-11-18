@@ -21,14 +21,17 @@ func signUpGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 }
 
 func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	email := r.FormValue("email")
+	user := User{}
+	user.Email = r.FormValue("email")
 	password := r.FormValue("password")
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
 		panic(err)
 	}
-	_, err = s.db.Exec("INSERT INTO users(email, hash) VALUES ($1, $2)", email, hash)
+
+	row := s.db.QueryRow("INSERT INTO users(email, hash) VALUES ($1, $2) RETURNING id", user.Email, hash)
+	err = row.Scan(&user.Id)
 
 	if err != nil {
 		var message string
@@ -43,7 +46,6 @@ func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 		alert := Alert{message, "danger"}
 		signUpTmpl.Execute(w, alert)
 	} else {
-		user := User{email}
 		token := s.CreateToken(user)
 		s.SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)

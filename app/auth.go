@@ -9,11 +9,13 @@ import (
 )
 
 type User struct {
+	Id    int64
 	Email string
 }
 
 func (s *Server) CreateToken(user User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":    user.Id,
 		"email": user.Email,
 	})
 
@@ -48,7 +50,7 @@ func (s *Server) ValidateToken(tokenString string) bool {
 		return false
 	}
 
-	row := s.db.QueryRow(`SELECT FROM users WHERE email=$1 LIMIT 1`, claims["email"])
+	row := s.db.QueryRow(`SELECT FROM users WHERE id=$1 LIMIT 1`, claims["id"])
 	err = row.Scan()
 
 	if err != nil {

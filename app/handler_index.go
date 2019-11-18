@@ -12,7 +12,7 @@ func indexGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	validUser := err == nil && s.ValidateToken(cookie.Value)
 
 	if validUser {
-		user := User{"dummy@dummy.com"}
+		user := User{2, "dummy@dummy.com"}
 		indexTmpl.Execute(w, user)
 	} else {
 		indexTmpl.Execute(w, nil)
