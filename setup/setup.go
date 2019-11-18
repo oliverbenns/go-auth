@@ -8,7 +8,7 @@ import (
 
 func main() {
 	db := pg.Init()
-	query, err := ioutil.ReadFile("setup.sql")
+	query, err := ioutil.ReadFile("setup/setup.sql")
 
 	if err != nil {
 		panic(err)
