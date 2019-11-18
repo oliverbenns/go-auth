@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
@@ -33,8 +32,7 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	password := r.FormValue("password")
 	var hash string
 
-	query := fmt.Sprintf("SELECT hash FROM users WHERE email='%s' LIMIT 1", email)
-	row := s.db.QueryRow(query)
+	row := s.db.QueryRow("SELECT hash FROM users WHERE email=$1 LIMIT 1", email)
 	err := row.Scan(&hash)
 
 	if err != nil {

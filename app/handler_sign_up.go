@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
@@ -29,9 +28,7 @@ func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	if err != nil {
 		panic(err)
 	}
-
-	query := fmt.Sprintf("INSERT INTO users(email, hash) VALUES ('%s', '%s')", email, hash)
-	_, err = s.db.Exec(query)
+	_, err = s.db.Exec("INSERT INTO users(email, hash) VALUES ($1, $2)", email, hash)
 
 	if err != nil {
 		var message string

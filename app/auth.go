@@ -48,8 +48,7 @@ func (s *Server) ValidateToken(tokenString string) bool {
 		return false
 	}
 
-	query := fmt.Sprintf("SELECT FROM users WHERE email='%s' LIMIT 1", claims["email"])
-	row := s.db.QueryRow(query)
+	row := s.db.QueryRow(`SELECT FROM users WHERE email=$1 LIMIT 1`, claims["email"])
 	err = row.Scan()
 
 	if err != nil {
