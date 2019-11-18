@@ -17,10 +17,9 @@ type Alert struct {
 var invalidCredentialsAlert = Alert{"Invalid credentials. Please try again.", "danger"}
 
 func loginGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	cookie, err := r.Cookie("user_token")
-	validUser := err == nil && s.ValidateToken(cookie.Value)
+	user := GetUserToken(r)
 
-	if validUser {
+	if user != nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		loginTmpl.Execute(w, nil)
@@ -48,8 +47,8 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	validCredentials := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 
 	if validCredentials {
-		token := s.CreateToken(user)
-		s.SetUserToken(w, token)
+		token := CreateUserToken(user)
+		SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		loginTmpl.Execute(w, invalidCredentialsAlert)

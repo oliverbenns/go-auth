@@ -8,11 +8,9 @@ import (
 var indexTmpl = template.Must(template.ParseFiles("app/views/layout.html", "app/views/index.html"))
 
 func indexGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	cookie, err := r.Cookie("user_token")
-	validUser := err == nil && s.ValidateToken(cookie.Value)
+	user := GetUserToken(r)
 
-	if validUser {
-		user := User{2, "dummy@dummy.com"}
+	if user != nil {
 		indexTmpl.Execute(w, user)
 	} else {
 		indexTmpl.Execute(w, nil)

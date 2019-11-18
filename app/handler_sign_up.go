@@ -10,10 +10,9 @@ import (
 var signUpTmpl = template.Must(template.ParseFiles("app/views/layout.html", "app/views/sign_up.html"))
 
 func signUpGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	cookie, err := r.Cookie("user_token")
-	validUser := err == nil && s.ValidateToken(cookie.Value)
+	user := GetUserToken(r)
 
-	if validUser {
+	if user != nil {
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		signUpTmpl.Execute(w, nil)
@@ -46,8 +45,8 @@ func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 		alert := Alert{message, "danger"}
 		signUpTmpl.Execute(w, alert)
 	} else {
-		token := s.CreateToken(user)
-		s.SetUserToken(w, token)
+		token := CreateUserToken(user)
+		SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }

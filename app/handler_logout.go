@@ -5,7 +5,7 @@ import (
 )
 
 func logoutPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	s.SetUserToken(w, "")
+	SetUserToken(w, "")
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 

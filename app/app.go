@@ -8,6 +8,11 @@ import (
 	"os"
 )
 
+type User struct {
+	Id    int64
+	Email string
+}
+
 func main() {
 	server := Server{}
 	server.db = pg.Init()
