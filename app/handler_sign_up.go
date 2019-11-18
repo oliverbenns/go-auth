@@ -2,12 +2,11 @@ package main
 
 import (
 	"golang.org/x/crypto/bcrypt"
-	"html/template"
 	"net/http"
 	"strings"
 )
 
-var signUpTmpl = template.Must(template.ParseFiles("app/views/layout.html", "app/views/sign_up.html"))
+var signUpTmpl = LoadTemplate("sign_up.html")
 
 func signUpGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	user := GetUserToken(r)

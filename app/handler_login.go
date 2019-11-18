@@ -3,16 +3,10 @@ package main
 import (
 	"database/sql"
 	"golang.org/x/crypto/bcrypt"
-	"html/template"
 	"net/http"
 )
 
-var loginTmpl = template.Must(template.ParseFiles("app/views/layout.html", "app/views/login.html"))
-
-type Alert struct {
-	Message string
-	Theme   string
-}
+var loginTmpl = LoadTemplate("login.html")
 
 var invalidCredentialsAlert = Alert{"Invalid credentials. Please try again.", "danger"}
 

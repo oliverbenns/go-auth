@@ -1,11 +1,10 @@
 package main
 
 import (
-	"html/template"
 	"net/http"
 )
 
-var indexTmpl = template.Must(template.ParseFiles("app/views/layout.html", "app/views/index.html"))
+var indexTmpl = LoadTemplate("index.html")
 
 func indexGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 	user := GetUserToken(r)

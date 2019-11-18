@@ -13,4 +13,5 @@ An experimental project to authenticate users in Go.
 ## Running 
 
 - Setup: `go run setup/setup.go`
-- Start server: `go run app/*.go`
+- Start server: ` go build app/*.go && ./app/command-line-arguments`
+- Test: `go test ./app`
