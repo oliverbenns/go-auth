@@ -1,10 +1,9 @@
-package auth
+package main
 
 import (
 	"database/sql"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/oliverbenns/go-auth/db"
 	"net/http"
 	"os"
 )
@@ -13,7 +12,7 @@ type User struct {
 	Email string
 }
 
-func CreateToken(user User) string {
+func (s *Server) CreateToken(user User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": user.Email,
 	})
@@ -26,7 +25,7 @@ func CreateToken(user User) string {
 	return tokenString
 }
 
-func ValidateToken(tokenString string) bool {
+func (s *Server) ValidateToken(tokenString string) bool {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -50,7 +49,7 @@ func ValidateToken(tokenString string) bool {
 	}
 
 	query := fmt.Sprintf("SELECT FROM users WHERE email='%s' LIMIT 1", claims["email"])
-	row := db.Db.QueryRow(query)
+	row := s.db.QueryRow(query)
 	err = row.Scan()
 
 	if err != nil {
@@ -64,7 +63,7 @@ func ValidateToken(tokenString string) bool {
 	return true
 }
 
-func SetUserToken(w http.ResponseWriter, userToken string) {
+func (s *Server) SetUserToken(w http.ResponseWriter, userToken string) {
 	cookie := http.Cookie{
 		Name:   "user_token",
 		Value:  userToken,
