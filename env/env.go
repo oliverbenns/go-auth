@@ -3,6 +3,8 @@ package env
 import (
 	"github.com/joho/godotenv"
 	"os"
+	"path"
+	"runtime"
 	"strconv"
 )
 
@@ -17,7 +19,17 @@ type Env struct {
 }
 
 func GetEnv() Env {
-	err := godotenv.Load()
+	_, callerFileName, _, ok := runtime.Caller(0)
+
+	if !ok {
+		panic("No caller information")
+	}
+
+	dir := path.Dir(callerFileName)
+
+	uri := path.Join(dir, "../.env")
+
+	err := godotenv.Load(uri)
 
 	if err != nil {
 		panic(err)
