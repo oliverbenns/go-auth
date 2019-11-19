@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -32,6 +31,7 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusUnauthorized)
 			loginTmpl.Execute(w, invalidCredentialsAlert)
 			return
 		} else {
@@ -41,12 +41,12 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 	validCredentials := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 
-	fmt.Println(s.env)
 	if validCredentials {
 		token := CreateUserToken(user, s.env.JwtSecretKey)
 		SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
+		w.WriteHeader(http.StatusUnauthorized)
 		loginTmpl.Execute(w, invalidCredentialsAlert)
 	}
 }
