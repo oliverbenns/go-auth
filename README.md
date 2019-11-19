@@ -10,6 +10,7 @@ An experimental project to authenticate users in Go.
 - There is no server side validation for forms (like sign up).
 - Error handling isn't particularly well done.
 - Test cases don't handle every case.
+- Jwts & Cookies are not set to expire.
 
 ## Running 
 
