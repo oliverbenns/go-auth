@@ -1,19 +1,15 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
+	"github.com/oliverbenns/go-auth/env"
 	"github.com/oliverbenns/go-auth/pg"
 	"io/ioutil"
 )
 
 func main() {
-	err := godotenv.Load()
+	eenv := env.GetEnv()
 
-	if err != nil {
-		panic(err)
-	}
-
-	db := pg.Init()
+	db := pg.Init(eenv)
 	query, err := ioutil.ReadFile("setup/setup.sql")
 
 	if err != nil {

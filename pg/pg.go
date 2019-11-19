@@ -4,15 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"os"
-	"strconv"
+	"github.com/oliverbenns/go-auth/env"
 )
 
-func Init() *sql.DB {
-	port, _ := strconv.ParseInt(os.Getenv("DB_PORT"), 10, 64)
+func Init(env env.Env) *sql.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		os.Getenv("DB_HOST"), port, os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
+		env.DbHost, env.DbPort, env.DbUser, env.DbPass, env.DbName)
 
 	db, err := sql.Open("postgres", psqlInfo)
 

@@ -2,31 +2,20 @@ package main
 
 import (
 	"database/sql"
-	"github.com/joho/godotenv"
+	"github.com/oliverbenns/go-auth/env"
 	"github.com/oliverbenns/go-auth/pg"
-	"os"
 )
-
-type Env struct {
-	jwtSecretKey string
-}
 
 type Server struct {
 	db  *sql.DB
-	env Env
+	env env.Env
 }
 
 func NewServer() Server {
-	err := godotenv.Load()
-
-	if err != nil {
-		panic(err)
-	}
+	serverEnv := env.GetEnv()
 
 	return Server{
-		db: pg.Init(),
-		env: Env{
-			jwtSecretKey: os.Getenv("JWT_SECRET_KEY"),
-		},
+		db:  pg.Init(serverEnv),
+		env: serverEnv,
 	}
 }

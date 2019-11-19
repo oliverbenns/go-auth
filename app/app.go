@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 )
 
 type User struct {
@@ -20,10 +19,9 @@ func main() {
 	mux.HandleFunc("/sign-up", server.SignUpHandler())
 	mux.HandleFunc("/", server.IndexHandler())
 
-	port := os.Getenv("PORT")
-
-	fmt.Println("Server started on port", port)
-	err := http.ListenAndServe(":"+port, mux)
+	fmt.Println("Server started on port", server.env.Port)
+	address := fmt.Sprintf(":%d", server.env.Port)
+	err := http.ListenAndServe(address, mux)
 
 	if err != nil {
 		panic(err)

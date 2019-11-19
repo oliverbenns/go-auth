@@ -12,7 +12,7 @@ var loginTmpl = LoadTemplate("login.html")
 var invalidCredentialsAlert = Alert{"Invalid credentials. Please try again.", "danger"}
 
 func loginGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	user := GetUserToken(r, s.env.jwtSecretKey)
+	user := GetUserToken(r, s.env.JwtSecretKey)
 
 	if user != nil {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -43,7 +43,7 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 	fmt.Println(s.env)
 	if validCredentials {
-		token := CreateUserToken(user, s.env.jwtSecretKey)
+		token := CreateUserToken(user, s.env.JwtSecretKey)
 		SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
