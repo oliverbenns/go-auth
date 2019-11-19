@@ -18,7 +18,7 @@ func indexGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 func (s *Server) IndexHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
+		if r.Method == http.MethodGet {
 			indexGetHandler(w, r, s)
 		} else {
 			w.WriteHeader(http.StatusNotImplemented)

@@ -11,7 +11,7 @@ func logoutPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 func (s *Server) LogoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
+		if r.Method == http.MethodPost {
 			logoutPostHandler(w, r, s)
 		} else {
 			w.WriteHeader(http.StatusNotImplemented)

@@ -53,10 +53,10 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 func (s *Server) LoginHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
+		if r.Method == http.MethodGet {
 			loginGetHandler(w, r, s)
 
-		} else if r.Method == "POST" {
+		} else if r.Method == http.MethodPost {
 			loginPostHandler(w, r, s)
 		} else {
 			w.WriteHeader(http.StatusNotImplemented)
