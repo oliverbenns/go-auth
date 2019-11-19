@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
-	"os"
 )
 
 type UserClaims struct {
@@ -13,13 +12,12 @@ type UserClaims struct {
 	jwt.StandardClaims
 }
 
-func CreateUserToken(user User) string {
+func CreateUserToken(user User, secretKey string) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    user.Id,
 		"email": user.Email,
 	})
 
-	secretKey := os.Getenv("JWT_SECRET_KEY")
 	secret := []byte(secretKey)
 
 	tokenString, _ := token.SignedString(secret)
@@ -27,14 +25,12 @@ func CreateUserToken(user User) string {
 	return tokenString
 }
 
-func ParseUserToken(tokenString string) (*UserClaims, error) {
+func ParseUserToken(tokenString string, secretKey string) (*UserClaims, error) {
 	var token *jwt.Token
 	var err error
 
 	token, err = jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
-		secretKey := os.Getenv("JWT_SECRET_KEY")
-		secret := []byte(secretKey)
-		return secret, nil
+		return []byte(secretKey), nil
 	})
 
 	if err != nil {
@@ -63,14 +59,14 @@ func SetUserToken(w http.ResponseWriter, userToken string) {
 	http.SetCookie(w, &cookie)
 }
 
-func GetUserToken(r *http.Request) *User {
+func GetUserToken(r *http.Request, secretKey string) *User {
 	cookie, err := r.Cookie("user_token")
 
 	if err != nil {
 		return nil
 	}
 
-	userClaims, err := ParseUserToken(cookie.Value)
+	userClaims, err := ParseUserToken(cookie.Value, secretKey)
 
 	if err != nil {
 		return nil

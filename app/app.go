@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/joho/godotenv/autoload"
-	"github.com/oliverbenns/go-auth/pg"
 	"net/http"
 	"os"
 )
@@ -14,9 +12,7 @@ type User struct {
 }
 
 func main() {
-	server := Server{}
-	server.db = pg.Init()
-
+	server := NewServer()
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/logout", server.LogoutHandler())

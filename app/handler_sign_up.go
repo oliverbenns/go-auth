@@ -9,7 +9,7 @@ import (
 var signUpTmpl = LoadTemplate("sign_up.html")
 
 func signUpGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	user := GetUserToken(r)
+	user := GetUserToken(r, s.env.jwtSecretKey)
 
 	if user != nil {
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -44,7 +44,7 @@ func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 		alert := Alert{message, "danger"}
 		signUpTmpl.Execute(w, alert)
 	} else {
-		token := CreateUserToken(user)
+		token := CreateUserToken(user, s.env.jwtSecretKey)
 		SetUserToken(w, token)
 		http.Redirect(w, r, "/", http.StatusFound)
 	}

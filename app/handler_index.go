@@ -7,7 +7,7 @@ import (
 var indexTmpl = LoadTemplate("index.html")
 
 func indexGetHandler(w http.ResponseWriter, r *http.Request, s *Server) {
-	user := GetUserToken(r)
+	user := GetUserToken(r, s.env.jwtSecretKey)
 
 	if user != nil {
 		indexTmpl.Execute(w, user)

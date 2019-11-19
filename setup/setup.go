@@ -1,12 +1,18 @@
 package main
 
 import (
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
 	"github.com/oliverbenns/go-auth/pg"
 	"io/ioutil"
 )
 
 func main() {
+	err := godotenv.Load()
+
+	if err != nil {
+		panic(err)
+	}
+
 	db := pg.Init()
 	query, err := ioutil.ReadFile("setup/setup.sql")
 
