@@ -23,16 +23,9 @@ func TestSignUpGetHandler_NoUser(t *testing.T) {
 }
 
 func TestSignUpGetHandler_WithUser(t *testing.T) {
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpZCI6Mn0.fsA-0yhLc_XwndToIxmytRkBmvD78akk1mkJ7Be_xNs"
-
-	cookie := http.Cookie{
-		Name:  "user_token",
-		Value: token,
-	}
-
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	r.AddCookie(&cookie)
+	r.AddCookie(&testAuthCookie)
 	server := Server{}
 	server.env.JwtSecretKey = "12345"
 
@@ -46,8 +39,8 @@ func TestSignUpGetHandler_WithUser(t *testing.T) {
 
 func TestSignUpPostHandler_ExistingUser(t *testing.T) {
 	w := httptest.NewRecorder()
-	r := createPostRequest("john@example.com", "qPWKXkkwjB")
-	server := createServer()
+	r := CreateAuthFormPostRequest("john@example.com", "qPWKXkkwjB")
+	server := CreateServer()
 	handler := server.SignUpHandler()
 	handler(w, r)
 
@@ -67,8 +60,8 @@ func TestSignUpPostHandler_Success(t *testing.T) {
 	now := time.Now()
 	email := fmt.Sprintf("test-%d@example.com", now.Unix())
 	password := string(now.Unix())
-	r := createPostRequest(email, password)
-	server := createServer()
+	r := CreateAuthFormPostRequest(email, password)
+	server := CreateServer()
 
 	handler := server.SignUpHandler()
 	handler(w, r)

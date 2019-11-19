@@ -7,27 +7,17 @@ import (
 )
 
 func TestCreateUserToken(t *testing.T) {
-	user := User{
-		Id:    2,
-		Email: "example@example.com",
-	}
+	token := CreateUserToken(testUser, "12345")
 
-	got := CreateUserToken(user, "12345")
-	expected := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpZCI6Mn0.fsA-0yhLc_XwndToIxmytRkBmvD78akk1mkJ7Be_xNs"
-	if got != expected {
+	if token != testUserToken {
 		t.Error("Incorrect token generated")
 	}
 }
 
 func TestParseUserToken(t *testing.T) {
-	user := User{
-		Id:    2,
-		Email: "example@example.com",
-	}
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpZCI6Mn0.fsA-0yhLc_XwndToIxmytRkBmvD78akk1mkJ7Be_xNs"
-	userClaims, _ := ParseUserToken(token, "12345")
+	userClaims, _ := ParseUserToken(testUserToken, "12345")
 
-	if userClaims.Id != user.Id || userClaims.Email != user.Email {
+	if userClaims.Id != testUser.Id || userClaims.Email != testUser.Email {
 		t.Error("Parsed user is incorrect")
 	}
 }
@@ -50,22 +40,16 @@ func TestSetUserToken(t *testing.T) {
 }
 
 func TestGetUserToken(t *testing.T) {
-	user := User{
-		Id:    2,
-		Email: "example@example.com",
-	}
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpZCI6Mn0.fsA-0yhLc_XwndToIxmytRkBmvD78akk1mkJ7Be_xNs"
-
 	cookie := http.Cookie{
 		Name:  "user_token",
-		Value: token,
+		Value: testUserToken,
 	}
 
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	r.AddCookie(&cookie)
 	userFromToken := GetUserToken(r, "12345")
 
-	if userFromToken.Id != user.Id || userFromToken.Email != user.Email {
+	if userFromToken.Id != testUser.Id || userFromToken.Email != testUser.Email {
 		t.Error("Unable to get user from cookie")
 	}
 }

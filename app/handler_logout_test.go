@@ -8,16 +8,9 @@ import (
 )
 
 func TestSignUpPostHandler(t *testing.T) {
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImV4YW1wbGVAZXhhbXBsZS5jb20iLCJpZCI6Mn0.fsA-0yhLc_XwndToIxmytRkBmvD78akk1mkJ7Be_xNs"
-
-	cookie := http.Cookie{
-		Name:  "user_token",
-		Value: token,
-	}
-
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodPost, "/", nil)
-	r.AddCookie(&cookie)
+	r.AddCookie(&testAuthCookie)
 	server := Server{}
 	server.env.JwtSecretKey = "12345"
 
