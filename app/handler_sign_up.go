@@ -37,8 +37,10 @@ func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 		// @TODO: Find a better way to do this.
 		if strings.Contains(err.Error(), "unique constraint \"users_email_key\"") {
 			message = "User already exists with that email."
+			w.WriteHeader(http.StatusUnprocessableEntity)
 		} else {
 			message = "An unknown error occured."
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 
 		alert := Alert{message, "danger"}
