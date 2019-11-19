@@ -11,9 +11,10 @@ func logoutPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 func (s *Server) LogoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
+		switch r.Method {
+		case http.MethodPost:
 			logoutPostHandler(w, r, s)
-		} else {
+		default:
 			w.WriteHeader(http.StatusNotImplemented)
 		}
 	}

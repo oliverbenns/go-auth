@@ -54,12 +54,12 @@ func signUpPostHandler(w http.ResponseWriter, r *http.Request, s *Server) {
 
 func (s *Server) SignUpHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
+		switch r.Method {
+		case http.MethodGet:
 			signUpGetHandler(w, r, s)
-
-		} else if r.Method == http.MethodPost {
+		case http.MethodPost:
 			signUpPostHandler(w, r, s)
-		} else {
+		default:
 			w.WriteHeader(http.StatusNotImplemented)
 		}
 	}
